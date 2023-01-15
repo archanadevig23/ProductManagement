@@ -1,4 +1,8 @@
-package PACKAGE_NAME;
+public class InvalidWholesalerCodeException extends Exception {
 
-public class InvalidWholesalerCodeException {
+    String InvalidWholesalerCodeException(String message)
+    {
+        return message;
+    }
+
 }

@@ -1,4 +1,8 @@
-package PACKAGE_NAME;
+public class InsufficientStockAvailableException extends Exception {
 
-public class InsufficientStockAvailableException {
+    String InsufficientStockAvailableException(String message)
+    {
+        return message;
+    }
+
 }

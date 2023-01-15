@@ -1,6 +1,6 @@
-public class NoProductsException extends Exception{
+public class NoDataException extends Exception{
 
-    String NoProductsException(String message)
+    String NoDataException(String message)
     {
         return message;
     }

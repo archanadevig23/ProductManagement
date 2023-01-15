@@ -1,4 +1,8 @@
-package PACKAGE_NAME;
+public class InvalidProductCodeException extends Exception {
 
-public class InvalidProductCodeException {
+    String InvalidProductCodeException(String message)
+    {
+        return message;
+    }
+
 }
