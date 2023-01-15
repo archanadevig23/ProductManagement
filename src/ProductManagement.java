@@ -105,7 +105,7 @@ public class ProductManagement {
         try {
 
             if(products.size()<=0)
-                throw new NoDataException();
+                throw new NoDataException("There are no products available in the warehouse! ");
             else
             {
                 System.out.println("----------------------------------------");
@@ -121,7 +121,7 @@ public class ProductManagement {
         }
 
         catch (NoDataException e) {
-            e.NoDataException("There are no products available in the warehouse! ");
+            System.out.println(e);
         }
     }
 
@@ -130,7 +130,7 @@ public class ProductManagement {
         try {
 
             if(wholesalers.size()<=0)
-                throw new NoDataException();
+                throw new NoDataException("There are no products available in the warehouse! ");
             else
             {
                 System.out.println("----------------------------------------");
@@ -153,7 +153,7 @@ public class ProductManagement {
         }
 
         catch (NoDataException e) {
-            e.NoDataException("There are no wholesalers available! ");
+            System.out.println(e);
         }
     }
 
@@ -162,7 +162,7 @@ public class ProductManagement {
         try {
 
             if(retailers.size()<=0)
-                throw new NoDataException();
+                throw new NoDataException("There are no products available in the warehouse! ");
             else
             {
                 System.out.println("----------------------------------------");
@@ -181,7 +181,7 @@ public class ProductManagement {
         }
 
         catch (NoDataException e) {
-            e.NoDataException("There are no retailers available! ");
+            System.out.println(e);
         }
     }
 
@@ -235,41 +235,40 @@ public class ProductManagement {
                                 GeneratePDF.generate(wholesaler, wholesalers.get(index).w_products.get(w_index));
                             }
                             else
-                                throw new InsufficientStockAvailableException();
+                                throw new InsufficientStockAvailableException("Requested stock of product " + p_id + " is not available in the warehouse");
 
                         }
 
                         catch (InsufficientStockAvailableException e) {
-                            e.InsufficientStockAvailableException(" Requested stock of product " + p_id + " is not available in the warehouse");
+                            System.out.println(e);
                         }
 
                     }
             }
+
+                try {
+                    if(pr==false)
+                        throw new InvalidProductCodeException("You have entered an invalid product code. Enter a valid one");
+                }
+                catch (InvalidProductCodeException e) {
+                    System.out.println(e);
+                }
 
             sumUpWProducts(index);
 
             }
 
         }
-        System.out.println("wb : "+ wb);
         try {
-            System.out.println("wb-- : "+ wb);
             if (wb == false)
             {
-                throw new InvalidWholesalerCodeException();
+                throw new InvalidWholesalerCodeException("You have entered an invalid wholesaler code. Enter a valid one");
             }
         }
         catch (InvalidWholesalerCodeException e) {
-            System.out.println("inside");
-            e.InvalidWholesalerCodeException("You have entered an invalid product code. Enter a valid one");
+            System.out.println(e);
         }
-        try {
-            if(pr==false)
-                throw new InvalidProductCodeException();
-        }
-        catch (InvalidProductCodeException e) {
-            e.InvalidProductCodeException("You have entered an invalid product code. Enter a valid one");
-        }
+
     }
 
     // sum up wholesaler products before displaying
@@ -298,9 +297,15 @@ public class ProductManagement {
 
     static void allocateToRetailer(int r_id, int w_id, int p_id, int stock) {
 
+        boolean re = false;
+        boolean wb = false;
+        boolean pr = false;
+
         for(Retailers retailer: retailers) {
 
             if(retailer.id == r_id) {
+
+                re=true;
 
                 int r_index = retailers.indexOf(retailer);
 
@@ -308,50 +313,108 @@ public class ProductManagement {
 
                     if(wholesaler.id == w_id) {
 
+                        wb=true;
+
                         int w_index = wholesalers.indexOf(wholesaler);
 
                         for(Products product: products) {
 
-                            if(product.id == p_id) {
+                            try {
 
-                                if(product.stock >= stock) {
+                                if(product.id == p_id) {
 
-                                    int p_index = products.indexOf(product);
+                                    pr=true;
 
-                                    Products p = new Products(product.id, product.name, 0, product.price, product.gst, w_id, r_id);
+                                    if(product.stock >= stock) {
 
-                                    retailers.get(r_index).r_products.add(p);
+                                        int p_index = products.indexOf(product);
 
-                                    wholesalers.get(w_index).w_products.get(p_index).stock -= stock;
+                                        Products p = new Products(product.id, product.name, 0, product.price, product.gst, w_id, r_id);
 
-                                    int re_index = -1;
+                                        retailers.get(r_index).r_products.add(p);
 
-                                    boolean r_bool[] = new boolean[retailers.get(r_index).r_products.size()];
+                                        System.out.println("Line 1 " + wholesalers.get(w_index));
+                                        System.out.println("Line 2 " + wholesalers.get(w_index).w_products.get(p_index));
 
-                                    for (Products r_product : retailers.get(r_index).r_products) {
-                                        r_bool[retailers.get(r_index).r_products.indexOf(r_product)] = false;
-                                        if (r_product.r_id == r_id) {
-                                            r_bool[retailers.get(r_index).r_products.indexOf(r_product)] = true;
-                                            re_index = retailers.get(r_index).r_products.indexOf(r_product);
+
+
+                                        wholesalers.get(w_index).w_products.get(p_index).stock -= stock;
+
+                                        int re_index = -1;
+
+                                        System.out.println("Line");
+
+                                        boolean r_bool[] = new boolean[retailers.get(r_index).r_products.size()];
+
+                                        for (Products r_product : retailers.get(r_index).r_products) {
+                                            r_bool[retailers.get(r_index).r_products.indexOf(r_product)] = false;
+                                            if (r_product.r_id == r_id) {
+                                                r_bool[retailers.get(r_index).r_products.indexOf(r_product)] = true;
+                                                re_index = retailers.get(r_index).r_products.indexOf(r_product);
+                                            }
                                         }
+
+                                        retailers.get(r_index).r_products.get(re_index).stock += stock;
+                                        GeneratePDF.generate(retailer, retailers.get(r_index).r_products.get(re_index));
                                     }
 
-                                    retailers.get(r_index).r_products.get(re_index).stock += stock;
-                                    GeneratePDF.generate(retailer, retailers.get(r_index).r_products.get(re_index));
+                                    else {
+
+                                        throw new InsufficientStockAvailableException("Requested stock of product " + p_id + " is not available in the wholesaler " + w_id);
+
+                                    }
+
                                 }
+
+
+                            }
+
+                            catch (InsufficientStockAvailableException e) {
+
+                                System.out.println(e);
 
                             }
 
                         }
+
+                        try {
+                            if(pr==false)
+                                throw new InvalidProductCodeException("You have entered an invalid product code. Enter a valid one");
+                        }
+                        catch (InvalidProductCodeException e) {
+                            System.out.println(e);
+                        }
+
                         sumUpRProducts(r_index);
 
                     }
 
                 }
 
+                try {
+                    if (wb == false)
+                    {
+                        throw new InvalidWholesalerCodeException("You have entered an invalid wholesaler code. Enter a valid one");
+                    }
+                }
+                catch (InvalidWholesalerCodeException e) {
+                    System.out.println(e);
+                }
+
             }
 
         }
+
+        try {
+            if (re == false)
+            {
+                throw new InvalidRetailerCodeException("You have entered an invalid retailer code. Enter a valid one");
+            }
+        }
+        catch (InvalidRetailerCodeException e) {
+            System.out.println(e);
+        }
+
     }
 
     static void sumUpRProducts(int r_index) {
@@ -375,72 +438,5 @@ public class ProductManagement {
         }
 
     }
-
-//    static void allocateToRetailer(int r_id, int w_r_id, int r_p_id, int stock) {
-//
-//        for (Retailers retailer : retailers) {
-//
-//            if (retailer.id == r_id) {
-//
-//                int r_index = retailers.indexOf(retailer);
-//
-//                for(Wholesalers wholesaler: wholesalers) {
-//
-//                    if(w_r_id == wholesaler.id) {
-//                        int w_index = wholesalers.indexOf(wholesaler);
-//                        for (Products product : products) {
-//                            if (product.id == r_p_id) {
-//                                if (product.stock >= stock) {
-//                                    int p_index = products.indexOf(product);
-//                                    System.out.println("hello + " + r_index);
-//                                    Products p = new Products(product.id, product.name, 0, r_id);
-//                                    retailers.get(r_index).r_products.add(p);
-//                                    System.out.println("size : " + retailers.get(r_index).r_products.size());
-//
-//
-//
-//                                    System.out.println(w_index + " " + p_index + " " +  wholesalers.get(w_index).w_products.size());
-//
-//                                    int pe_index = retailers.get(r_index).r_products.indexOf(p);
-//
-//                                    System.out.println("line 202 " + wholesalers.get(w_index).w_products.get(pe_index).stock);
-//
-//                                    wholesalers.get(w_index).w_products.get(pe_index).stock = wholesalers.get(w_index).w_products.get(pe_index).stock - stock;
-//
-//                                    System.out.println(wholesalers.get(w_index).w_products.get(pe_index).stock);
-//
-//                                    int re_index=-1;
-//
-//                                    System.out.println("r_index - " + r_index);
-//
-//                                    boolean w_bool[] = new boolean[retailers.get(r_index).r_products.size()];
-//
-//                                    System.out.println("test 1");
-//
-//                                    for(Products r_product: retailers.get(r_index).r_products)
-//                                    {
-//                                        System.out.println("test 2 " + wholesalers.get(r_index).w_products.size());
-//
-//                                        w_bool[wholesalers.get(r_index).w_products.indexOf(r_product)] = false;
-//
-//                                        System.out.println("test 3");
-//
-//                                        if(r_product.w_id == r_id) {
-//                                            w_bool[wholesalers.get(r_index).w_products.indexOf(r_product)] = true;
-//                                            re_index = wholesalers.get(r_index).w_products.indexOf(r_product);
-//                                        }
-//                                    }
-//
-//                                    System.out.println("line 228 ");
-//
-//                                    retailers.get(r_index).r_products.get(re_index).stock = retailers.get(r_index).r_products.get(re_index).stock + stock;
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
 
 }

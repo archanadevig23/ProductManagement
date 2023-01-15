@@ -1,8 +1,5 @@
-public class NoDataException extends Exception{
-
-    String NoDataException(String message)
-    {
-        return message;
+public class NoDataException extends Exception {
+    NoDataException(String message) {
+        super(message);
     }
-
 }

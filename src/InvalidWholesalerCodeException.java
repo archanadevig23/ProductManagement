@@ -1,8 +1,6 @@
 public class InvalidWholesalerCodeException extends Exception {
 
-    String InvalidWholesalerCodeException(String message)
-    {
-        return message;
+    InvalidWholesalerCodeException(String message) {
+        super(message);
     }
-
 }

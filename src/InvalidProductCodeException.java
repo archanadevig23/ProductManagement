@@ -1,8 +1,7 @@
 public class InvalidProductCodeException extends Exception {
 
-    String InvalidProductCodeException(String message)
-    {
-        return message;
+    InvalidProductCodeException(String message) {
+        super(message);
     }
 
 }
